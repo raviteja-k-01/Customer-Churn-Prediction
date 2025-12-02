@@ -1,6 +1,7 @@
 # ======================================================
 # STREAMLIT APP : CUSTOMER CHURN PREDICTION (FIXED SCHEMA)
 # ======================================================
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -8,6 +9,9 @@ import os, joblib
 from xgboost import XGBClassifier
 import shap
 import matplotlib.pyplot as plt
+
+# MUST BE FIRST STREAMLIT COMMAND
+st.set_page_config(page_title="Customer Churn Prediction", layout="centered")
 
 # -------------------------------
 # LOAD TRAINED MODEL
@@ -19,7 +23,7 @@ model = joblib.load(model_path)
 # Initialize SHAP Explainer once (cached)
 @st.cache_resource
 def load_shap_explainer(_model):
-    """Use leading underscore so Streamlit doesn’t try to hash this object"""
+    """Cache SHAP explainer to speed up performance"""
     return shap.Explainer(_model)
 
 explainer = load_shap_explainer(model)
@@ -33,7 +37,9 @@ X_columns = [
     "MonthlyCharges", "TotalCharges"
 ]
 
-st.set_page_config(page_title="Customer Churn Prediction", layout="centered")
+# -------------------------------
+# STREAMLIT PAGE STRUCTURE
+# -------------------------------
 st.title("💡 Customer Churn Prediction System")
 st.sidebar.title("Select Mode")
 mode = st.sidebar.radio("Mode:", ["🔮 Single Prediction", "📦 Batch Prediction"])
@@ -106,11 +112,8 @@ if mode == "🔮 Single Prediction":
         conf = round(prob[0]*100, 2) if pred[0] == 1 else round((1-prob[0])*100, 2)
         color = "red" if churn == "CHURN" else "green"
         st.markdown(f"<h3 style='color:{color};'>✅ Customer likely to {churn} (Confidence: {conf}%)</h3>", unsafe_allow_html=True)
-
-        # --- Store data for SHAP explanation ---
         st.session_state["last_input"] = df_input
 
-    # --- SHAP EXPLANATION SECTION (Fixed) ---
     if "last_input" in st.session_state:
         st.subheader("🔍 Explain this prediction")
         if st.button("Show SHAP Explanation"):
@@ -143,4 +146,5 @@ elif mode == "📦 Batch Prediction":
         st.download_button("📥 Download Predictions", csv, "batch_predictions.csv", "text/csv")
 
 if __name__ == "__main__":
-    st.write(" App successfully launched in local environment.")
+    st.write("App successfully launched in local environment.")
+
