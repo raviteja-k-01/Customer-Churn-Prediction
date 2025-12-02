@@ -1,5 +1,3 @@
-Absolutely ✅ — here’s your **entire final `README.md`** in a single **copyable code block** (ready for GitHub or portfolio).
-It’s clean, formatted, and directly reflects your **Telecom Customer Churn Prediction using XGBoost + Streamlit + SHAP** project.
 
 ---
 
@@ -61,9 +59,9 @@ Model trained using XGBoost — chosen for its strong performance on tabular dat
 
 ```python
 XGBClassifier(
-    n_estimators=300,
-    learning_rate=0.1,
-    max_depth=8,
+    n_estimators=250,
+    learning_rate=0.05,
+    max_depth=6,
     eval_metric='logloss',
     random_state=42
 )
@@ -123,7 +121,10 @@ streamlit run app/streamlit_app.py
 ## 📁 Project Structure
 
 ```
-Customer Churn Prediction Using Machine Learning/
+Customer-Churn-Prediction/
+│
+├── app/
+│   └── streamlit_app.py
 │
 ├── data/
 │   ├── telecom.csv
@@ -134,10 +135,9 @@ Customer Churn Prediction Using Machine Learning/
 │
 ├── src/
 │   ├── preprocess.py
-│   └── train.py
-│
-├── app/
-│   └── streamlit_app.py
+│   ├── train.py
+│   ├── data_inspect.py
+│   └── explain.py
 │
 ├── screenshots/
 │   ├── accuracy_report.png
@@ -147,7 +147,9 @@ Customer Churn Prediction Using Machine Learning/
 │
 ├── requirements.txt
 ├── README.md
-└── .gitignore
+├── .gitignore
+└── LICENSE
+
 ```
 
 ---

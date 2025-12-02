@@ -143,4 +143,4 @@ elif mode == "📦 Batch Prediction":
         st.download_button("📥 Download Predictions", csv, "batch_predictions.csv", "text/csv")
 
 if __name__ == "__main__":
-    st.write("✅ App successfully launched in local environment.")
+    st.write(" App successfully launched in local environment.")
