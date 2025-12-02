@@ -1,7 +1,4 @@
 
----
-
-````markdown
 # 🧠 Customer Churn Prediction Using Machine Learning
 
 ### Predicting whether a telecom customer will stay or leave using an explainable XGBoost model
