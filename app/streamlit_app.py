@@ -1,5 +1,6 @@
-
-# STREAMLIT APP : CUSTOMER CHURN PREDICTION (FIXED SCHEMA)
+# ======================================================
+# STREAMLIT APP : CUSTOMER CHURN PREDICTION (FINAL CLEAN VERSION)
+# ======================================================
 
 import streamlit as st
 import pandas as pd
@@ -9,41 +10,35 @@ from xgboost import XGBClassifier
 import shap
 import matplotlib.pyplot as plt
 
-
-# MUST BE FIRST STREAMLIT COMMAND
-
+# Must be the first Streamlit command
 st.set_page_config(page_title="Customer Churn Prediction", layout="centered")
 
-
-# LOAD TRAINED MODEL
-
+# ======================================================
+# LOAD TRAINED MODEL (CACHED)
+# ======================================================
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 model_path = os.path.join(base_dir, "model", "churn_model.json")
 
 @st.cache_resource
 def load_model():
-    """Load XGBoost model from JSON"""
     model = XGBClassifier()
     model.load_model(model_path)
     return model
 
 model = load_model()
-st.write("✅ Model loaded successfully!")
 
-
-# INITIALIZE SHAP EXPLAINER
-
+# ======================================================
+# INITIALIZE SHAP EXPLAINER (CACHED)
+# ======================================================
 @st.cache_resource
 def load_shap_explainer(_model):
-    """Cache SHAP explainer to speed up performance"""
     return shap.Explainer(_model)
 
 explainer = load_shap_explainer(model)
-st.write("✅ SHAP explainer initialized!")
 
-
-# FEATURE COLUMNS (same as training)
-
+# ======================================================
+# FEATURE COLUMNS
+# ======================================================
 X_columns = [
     "gender", "SeniorCitizen", "Partner", "Dependents", "tenure",
     "PhoneService", "MultipleLines", "InternetService", "OnlineSecurity",
@@ -52,24 +47,24 @@ X_columns = [
     "MonthlyCharges", "TotalCharges"
 ]
 
-
-# STREAMLIT PAGE STRUCTURE
-
+# ======================================================
+# PAGE LAYOUT
+# ======================================================
 st.title("💡 Customer Churn Prediction System")
 st.sidebar.title("Select Mode")
 mode = st.sidebar.radio("Mode:", ["🔮 Single Prediction", "📦 Batch Prediction"])
 
-
-# FUNCTION: PREDICT
-
+# ======================================================
+# PREDICTION FUNCTION
+# ======================================================
 def make_prediction(data: pd.DataFrame):
     probs = model.predict_proba(data)[:, 1]
     preds = (probs >= 0.40).astype(int)
     return preds, probs
 
-
+# ======================================================
 # SINGLE PREDICTION
-
+# ======================================================
 if mode == "🔮 Single Prediction":
     st.subheader("Enter Customer Details")
 
@@ -126,7 +121,10 @@ if mode == "🔮 Single Prediction":
         churn = "CHURN" if pred[0] == 1 else "STAY"
         conf = round(prob[0]*100, 2) if pred[0] == 1 else round((1-prob[0])*100, 2)
         color = "red" if churn == "CHURN" else "green"
-        st.markdown(f"<h3 style='color:{color};'>✅ Customer likely to {churn} (Confidence: {conf}%)</h3>", unsafe_allow_html=True)
+        st.markdown(
+            f"<h3 style='color:{color};'>✅ Customer likely to {churn} (Confidence: {conf}%)</h3>",
+            unsafe_allow_html=True,
+        )
         st.session_state["last_input"] = df_input
 
     if "last_input" in st.session_state:
@@ -140,9 +138,9 @@ if mode == "🔮 Single Prediction":
             shap.plots.waterfall(shap_values[0], show=False)
             st.pyplot(fig)
 
-
+# ======================================================
 # BATCH PREDICTION
-
+# ======================================================
 elif mode == "📦 Batch Prediction":
     st.subheader("Upload a CSV file for batch predictions")
     uploaded = st.file_uploader("Choose CSV", type=["csv"])
@@ -161,4 +159,4 @@ elif mode == "📦 Batch Prediction":
         st.download_button("📥 Download Predictions", csv, "batch_predictions.csv", "text/csv")
 
 if __name__ == "__main__":
-    st.write("App successfully launched in local environment.")
+    pass
