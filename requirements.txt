@@ -14,4 +14,5 @@ seaborn==0.13.2
 joblib==1.4.2
 streamlit==1.39.0
 shap==0.44.1
+ipython==8.28.0
 
