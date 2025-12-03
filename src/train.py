@@ -150,11 +150,14 @@ plt.close()
 print(f"✅ Feature importance saved at: {fi_path}")
 
 # ======================================================
-# 💾 4️⃣ SAVE TRAINED MODEL
+# SAVE MODEL IN MODERN XGBOOST JSON FORMAT (Recommended)
 # ======================================================
 model_dir = os.path.join(base_dir, "model")
 os.makedirs(model_dir, exist_ok=True)
-model_path = os.path.join(model_dir, "churn_model.pkl")
-joblib.dump(model, model_path)
-print(f"\n✅ Model saved successfully at: {model_path}")
+
+# Save model in JSON format for compatibility with newer XGBoost versions
+json_model_path = os.path.join(model_dir, "churn_model.json")
+model.save_model(json_model_path)
+
+print(f"\n✅ Model saved successfully in JSON format at: {json_model_path}")
 print("🎯 Training and reporting completed successfully!")

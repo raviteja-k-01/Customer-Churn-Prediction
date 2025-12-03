@@ -17,8 +17,9 @@ st.set_page_config(page_title="Customer Churn Prediction", layout="centered")
 # LOAD TRAINED MODEL
 # -------------------------------
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-model_path = os.path.join(base_dir, "model", "churn_model.pkl")
-model = joblib.load(model_path)
+model_path = os.path.join(base_dir, "model", "churn_model.json")
+model = XGBClassifier()
+model.load_model(model_path)
 
 # Initialize SHAP Explainer once (cached)
 @st.cache_resource
