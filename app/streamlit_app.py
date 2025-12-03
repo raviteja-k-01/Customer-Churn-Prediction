@@ -1,35 +1,49 @@
-# ======================================================
+
 # STREAMLIT APP : CUSTOMER CHURN PREDICTION (FIXED SCHEMA)
-# ======================================================
 
 import streamlit as st
 import pandas as pd
 import numpy as np
-import os, joblib
+import os
 from xgboost import XGBClassifier
 import shap
 import matplotlib.pyplot as plt
 
+
 # MUST BE FIRST STREAMLIT COMMAND
+
 st.set_page_config(page_title="Customer Churn Prediction", layout="centered")
 
-# -------------------------------
+
 # LOAD TRAINED MODEL
-# -------------------------------
+
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 model_path = os.path.join(base_dir, "model", "churn_model.json")
-model = XGBClassifier()
-model.load_model(model_path)
 
-# Initialize SHAP Explainer once (cached)
+@st.cache_resource
+def load_model():
+    """Load XGBoost model from JSON"""
+    model = XGBClassifier()
+    model.load_model(model_path)
+    return model
+
+model = load_model()
+st.write("✅ Model loaded successfully!")
+
+
+# INITIALIZE SHAP EXPLAINER
+
 @st.cache_resource
 def load_shap_explainer(_model):
     """Cache SHAP explainer to speed up performance"""
     return shap.Explainer(_model)
 
 explainer = load_shap_explainer(model)
+st.write("✅ SHAP explainer initialized!")
 
-# Feature columns (same order as training)
+
+# FEATURE COLUMNS (same as training)
+
 X_columns = [
     "gender", "SeniorCitizen", "Partner", "Dependents", "tenure",
     "PhoneService", "MultipleLines", "InternetService", "OnlineSecurity",
@@ -38,24 +52,24 @@ X_columns = [
     "MonthlyCharges", "TotalCharges"
 ]
 
-# -------------------------------
+
 # STREAMLIT PAGE STRUCTURE
-# -------------------------------
+
 st.title("💡 Customer Churn Prediction System")
 st.sidebar.title("Select Mode")
 mode = st.sidebar.radio("Mode:", ["🔮 Single Prediction", "📦 Batch Prediction"])
 
-# --------------------------------
+
 # FUNCTION: PREDICT
-# --------------------------------
+
 def make_prediction(data: pd.DataFrame):
     probs = model.predict_proba(data)[:, 1]
     preds = (probs >= 0.40).astype(int)
     return preds, probs
 
-# --------------------------------
+
 # SINGLE PREDICTION
-# --------------------------------
+
 if mode == "🔮 Single Prediction":
     st.subheader("Enter Customer Details")
 
@@ -126,9 +140,9 @@ if mode == "🔮 Single Prediction":
             shap.plots.waterfall(shap_values[0], show=False)
             st.pyplot(fig)
 
-# --------------------------------
+
 # BATCH PREDICTION
-# --------------------------------
+
 elif mode == "📦 Batch Prediction":
     st.subheader("Upload a CSV file for batch predictions")
     uploaded = st.file_uploader("Choose CSV", type=["csv"])
@@ -148,4 +162,3 @@ elif mode == "📦 Batch Prediction":
 
 if __name__ == "__main__":
     st.write("App successfully launched in local environment.")
-
